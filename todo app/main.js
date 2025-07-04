@@ -35,6 +35,31 @@ let notesData = [
         name: "Exercise",
         completed: false,
     },
+    {
+        id: 5,
+        name: "Call mom",
+        completed: true,
+    },
+    {
+        id: 6,
+        name: "Clean the house",
+        completed: false,
+    },
+    {
+        id: 7,
+        name: "Prepare dinner",
+        completed: true,
+    },
+    {
+        id: 8,
+        name: "Plan vacation",
+        completed: false,
+    },
+    {
+        id: 9,
+        name: "Organize workspace",
+        completed: true,
+    },
 ];
 
 const newNoteButton = document.querySelector(".note-window-button");
@@ -45,22 +70,58 @@ const cancelButton = document.querySelector("#cancel-button");
 
 const notesContainer = document.querySelector(".notes-container");
 
+const searchInput = document.querySelector("#search-input");
+const filterMenu = document.querySelector(".filter-menu");
+
+searchInput.addEventListener("input", () => {
+    renderNotes();
+});
+
+function searchNotes(rawNotes) {
+    const searchValue = searchInput.value.toLowerCase();
+
+    if (searchValue !== "") {
+        const filtered = rawNotes.filter((note) => {
+            return note.name.toLowerCase().includes(searchValue);
+        });
+        return filtered;
+    }
+    return rawNotes;
+}
+
+function filterNotes(rawNotes) {}
+
 function renderNotes() {
     loadNotes();
 
+    notesData = searchNotes(notesData);
+
     notesContainer.innerHTML = "";
 
-    notesData.forEach((note) => {
+    notesData.forEach((note, index) => {
         notesContainer.innerHTML += `
                 <div
-                    class="note flex flex-col justify-between items-center after:bg-indigo-500 after:h-[1px] after:w-full after:my-[16px]">
-                    <div class="flex justify-between items-center w-full transition-all duration-200">
+                    class="note flex flex-col justify-between items-center after:bg-indigo-500 after:h-[1px] after:w-full after:my-[8px] after:${
+                        index === notesData.length - 1 ? "opacity-0" : ""
+                    }">
+                    <div class="flex justify-between items-center w-full rounded-md hover:bg-[var(--light-purple)] py-[16px] px-[16px] transition-all duration-200">
                         <div class="flex items-center gap-[24px]">
-                            <input type="checkbox"
-                                class="note-checkmark border-[2px] border-indigo-500 w-[32px] aspect-square transition-all duration-200" onclick="checkNote(${
-                                    note.id
-                                })" ${note.completed ? "checked" : ""}>
-                            <p class="note-content text-[24px]">${note.name}</p>
+                            <label class="relative flex items-center justify-center">
+                                <input type="checkbox"
+                                    class="cursor-pointer peer appearance-none w-8 h-8 border-2 border-indigo-500 rounded-sm checked:bg-indigo-500 transition-colors duration-200"
+                                    onclick="checkNote(${note.id})"
+                                    ${note.completed ? "checked" : ""}>
+                                <svg class="absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
+                                    width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <mask id="path-1-inside-1_18_421" fill="white">
+                                    <path d="M4.9978 14.6488L1.72853e-05 9.74756L9.55927 2.22748e-06L14.5571 4.90124L4.9978 14.6488Z"/>
+                                    </mask>
+                                    <path d="M4.9978 14.6488L3.59745 16.0767L5.02539 17.4771L6.42574 16.0491L4.9978 14.6488ZM6.39816 13.2209L1.40037 8.31962L-1.40034 11.1755L3.59745 16.0767L6.39816 13.2209ZM13.1291 3.50089L3.56986 13.2484L6.42574 16.0491L15.985 6.30159L13.1291 3.50089Z" fill="#F7F7F7" mask="url(#path-1-inside-1_18_421)"/>
+                                </svg>
+                            </label>
+                            <p class="note-content text-[24px] ${
+                                note.completed && "line-through opacity-30"
+                            }">${note.name}</p>
                         </div>
                         <div class="note-buttons flex items-center">
                             <button
@@ -103,7 +164,13 @@ function saveNotes() {
 }
 
 function loadNotes() {
-    notesData = JSON.parse(localStorage.getItem("myNotes"));
+    const storedNotes = localStorage.getItem("myNotes");
+
+    if (storedNotes) {
+        notesData = JSON.parse(storedNotes);
+    } else {
+        notesData = [];
+    }
 }
 
 renderNotes();
