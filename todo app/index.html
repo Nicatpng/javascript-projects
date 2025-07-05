@@ -35,7 +35,7 @@
             --dark-purple: #534CC2;
             --light-purple: rgb(108, 99, 255, 0.2);
             --white: #F7F7F7;
-            --gray: #9ca3af;
+            --gray: rgba(156, 163, 175, 0.5);
             --black: #252525;
         }
 
@@ -59,7 +59,7 @@
             <div
                 class="search-container w-full py-[8px] px-[16px] border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
                 <input id="search-input" type="text" placeholder="Search note..."
-                    class="w-full h-[40px] focus:outline-none placeholder:text-[var(--gray)] caret-indigo-700 transition-all duration-200" />
+                    class="w-full h-[40px] focus:outline-none placeholder:text-[var(--gray)] caret-white transition-all duration-200" />
                 <button class="cursor-pointer">
                     <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -71,18 +71,6 @@
             <div class="relative group">
                 <select
                     class="filter-menu p-[10px] h-full pr-[32px] text-white rounded-md bg-[var(--purple)] active:bg-indigo-700 focus:outline-none active:shadow-md active:shadow-indigo-600/50 appearance-none cursor-pointer transition-all duration-200">
-                    <option value="all"
-                        class="bg-white appearance-none text-[var(--purple)] border-[2px] border-[var(--purple)] rounded-md active:bg-[var(--purple)]/50 transition-all duration-200">
-                        All
-                    </option>
-                    <option value="completed"
-                        class="bg-white appearance-none text-[var(--purple)] border-[2px] border-[var(--purple)] rounded-md active:bg-[var(--purple)]/50 transition-all duration-200">
-                        Complete
-                    </option>
-                    <option value="incomplete"
-                        class="bg-white appearance-none text-[var(--purple)] border-[2px] border-[var(--purple)] rounded-md active:bg-[var(--purple)]/50 transition-all duration-200">
-                        Incomplete
-                    </option>
                 </select>
                 <svg class="absolute right-[10px] top-[50%] rotate-180 group-focus-within:rotate-0" width="9" height="5"
                     viewBox="0 0 9 5" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -128,16 +116,29 @@
     <form
         class="note-form-container fixed inset-0 flex justify-center items-center z-50 opacity-0 invisible transition-all duration-200">
         <div
-            class="note-window absolute bg-[var(--primary-background)] rounded-3xl w-[500px] h-[300px] z-10 p-[32px] flex flex-col justify-between">
-            <div class="flex flex-col">
-                <h2 class="note-window-title text-[26px] text-center mb-[18px]">NEW NOTE</h2>
-                <div
-                    class="note-window-input w-full border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
-                    <input id="note-window-input" type="text" placeholder="Input your note..." required
-                        class="w-full focus:outline-none py-[8px] px-[16px] placeholder:text-[var(--gray)] caret-indigo-700 disabled:opacity-30 disabled:cursor-no-drop transition-all duration-200" />
+            class="note-window absolute bg-[var(--primary-background)] rounded-3xl w-[500px] z-10 p-[32px] flex flex-col justify-between gap-[24px]">
+            <h2 class="note-window-title text-[26px] text-center">NEW NOTE</h2>
+            <div>
+                <div class="flex flex-col gap-[24px]">
+                    <div class="flex flex-col gap-[8px] select-none">
+                        <label for="note-name-input">Name</label>
+                        <div
+                            class="w-full border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
+                            <input id="note-name-input" type="text" placeholder="Input your note..." required
+                                class="w-full focus:outline-none py-[8px] px-[16px] placeholder:text-[var(--gray)] caret-white disabled:opacity-30 transition-all disabled:transition-none duration-200" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-[8px] select-none">
+                        <label for="note-tag-input">Category</label>
+                        <div
+                            class="w-full border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
+                            <input id="note-tag-input" type="text" placeholder="work school personal"
+                                class="w-full focus:outline-none py-[8px] px-[16px] placeholder:text-[var(--gray)] caret-white disabled:opacity-30 transition-all disabled:transition-none duration-200" />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center mt-[32px]">
                 <button
                     class="bg-[var(--primary-background)] flex justify-center items-center rounded-md border-[2px] border-[var(--purple)] active:bg-[var(--purple)]/50 focus:outline-none active:shadow-md active:shadow-indigo-600/50 active:text-white cursor-pointer py-[10px] px-[24px] text-[var(--purple)] font-semibold transition-all duration-200"
                     id="cancel-button" type="button">CANCEL</button>

@@ -9,63 +9,13 @@ themeButton.addEventListener("click", () => {
     document.body.classList.toggle("light");
 });
 
-let notesData = [
-    {
-        id: 0,
-        name: "Buy groceries",
-        completed: false,
-    },
-    {
-        id: 1,
-        name: "Walk the dog",
-        completed: true,
-    },
-    {
-        id: 2,
-        name: "Finish homework",
-        completed: false,
-    },
-    {
-        id: 3,
-        name: "Read a book",
-        completed: true,
-    },
-    {
-        id: 4,
-        name: "Exercise",
-        completed: false,
-    },
-    {
-        id: 5,
-        name: "Call mom",
-        completed: true,
-    },
-    {
-        id: 6,
-        name: "Clean the house",
-        completed: false,
-    },
-    {
-        id: 7,
-        name: "Prepare dinner",
-        completed: true,
-    },
-    {
-        id: 8,
-        name: "Plan vacation",
-        completed: false,
-    },
-    {
-        id: 9,
-        name: "Organize workspace",
-        completed: true,
-    },
-];
+let notesData = [];
 
 const newNoteButton = document.querySelector(".note-window-button");
 const noteForm = document.querySelector(".note-form-container");
 const noteWindowTitle = document.querySelector(".note-window-title");
-const noteWindowInput = document.querySelector("#note-window-input");
+const noteNameInput = document.querySelector("#note-name-input");
+const noteTagInput = document.querySelector("#note-tag-input");
 const cancelButton = document.querySelector("#cancel-button");
 
 const notesContainer = document.querySelector(".notes-container");
@@ -83,10 +33,14 @@ function searchNotes(rawNotes) {
     const searchValue = searchInput.value.toLowerCase();
 
     if (searchValue !== "") {
-        const filtered = rawNotes.filter((note) => {
-            return note.name.toLowerCase().includes(searchValue);
-        });
-        return filtered;
+        if (searchValue.startsWith("#")) {
+            const tag = searchValue.slice(1);
+            return rawNotes.filter((note) => {
+                return note.tags.some((noteTag) => noteTag.toLowerCase().includes(tag));
+            });
+        } else {
+            return rawNotes.filter((note) => note.name.toLowerCase().includes(searchValue));
+        }
     }
     return rawNotes;
 }
@@ -100,15 +54,17 @@ function filterNotes(rawNotes) {
 
     if (filterValue !== "" && filterValue !== "all") {
         const filtered = rawNotes.filter((note) => {
-            switch (filterValue) {
-                case "completed":
-                    return note["completed"];
-                case "incomplete":
-                    return !note["completed"];
+            if (filterValue === "completed") {
+                return note["completed"];
+            } else if (filterValue === "incomplete") {
+                return !note["completed"];
+            } else {
+                return note.tags.some((tag) => tag.toLowerCase() === filterValue);
             }
         });
         return filtered;
     }
+    renderFilterMenu();
     return rawNotes;
 }
 
@@ -135,24 +91,26 @@ function renderNotes() {
     notesData.forEach((note, index) => {
         notesContainer.innerHTML += `
                 <div
-                    class="note flex flex-col justify-between items-center after:bg-[var(--purple)] after:h-[1px] after:w-full after:my-[8px] 
+                    class="note select-none flex flex-col justify-between items-center after:bg-[var(--purple)] after:h-[1px] after:w-full after:my-[8px] 
                     after: ${index === notesData.length - 1 ? "after:opacity-0" : ""}">
                     <div class="flex justify-between items-center w-full gap-[16px]">
                         <p class="text-[20px] text-[var(--gray)] mr-[10px] min-w-[0px] max-w-[0px] text-end italic">
                         ${note.index}.</p>
                         <div class="relative flex items-center justify-start w-full py-[16px] px-[16px]">
-                            <input type="checkbox"
-                                class="peer appearance-none w-8 h-8 cursor-pointer border-[2px] border-[var(--purple)] rounded-sm checked:bg-[var(--purple)] transition-colors duration-200"
-                                ${note.completed ? "checked" : ""}
-                                onclick="checkNote(${note.id})">
-                            <svg class="absolute inest-y-[0] mx-[9px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
+                            <div class="note-checkbox rounded-[2px] p-[6px] outline-[2px] outline-[var(--purple)] cursor-pointer transition-all duration-200
+                            ${note.completed ? "bg-[var(--purple)]" : ""}"
+                            onclick="checkNote(${note.id}, this)">
+                                <svg class="transition-all duration-200
+                                ${!note.completed ? "opacity-0" : ""}"
                                 width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <mask id="path-1-inside-1_18_421" fill="white">
                                 <path d="M4.9978 14.6488L1.72853e-05 9.74756L9.55927 2.22748e-06L14.5571 4.90124L4.9978 14.6488Z"/>
                                 </mask>
                                 <path d="M4.9978 14.6488L3.59745 16.0767L5.02539 17.4771L6.42574 16.0491L4.9978 14.6488ZM6.39816 13.2209L1.40037 8.31962L-1.40034 11.1755L3.59745 16.0767L6.39816 13.2209ZM13.1291 3.50089L3.56986 13.2484L6.42574 16.0491L15.985 6.30159L13.1291 3.50089Z" fill="#F7F7F7" mask="url(#path-1-inside-1_18_421)"/>
                             </svg>
-                            <p class="note-content flex justify-start items-center h-full max-w-full absolute left-[64px] right-0 px-[16px] text-[24px] peer-checked:line-through peer-checked:text-[var(--gray)] truncate cursor-pointer rounded-md hover:bg-[var(--light-purple)] transition-all duration-200"
+                            </div>
+                            <p class="note-content flex justify-start items-center h-full max-w-full absolute left-[64px] right-0 px-[16px] text-[24px] truncate cursor-pointer rounded-md hover:bg-[var(--light-purple)] transition-all duration-200
+                            ${note.completed ? "line-through text-[var(--gray)]" : ""}"
                             onclick="updateNoteWindow('view', ${note.id})">
                                 ${note.name}</p>
                         </div>
@@ -204,6 +162,35 @@ function loadNotes() {
     }
 }
 
+function renderFilterMenu() {
+    filterMenu.innerHTML = "";
+
+    let allTags = ["all", "completed", "incomplete"];
+
+    console.log(notesData);
+
+    notesData.forEach((note) => {
+        if (note.tags) {
+            note.tags.forEach((tag) => {
+                if (!allTags.includes(tag)) {
+                    allTags.push(tag);
+                }
+            });
+        }
+    });
+
+    allTags.forEach((tag) => {
+        if (tag) {
+            filterMenu.innerHTML += `
+                        <option value="${tag}"
+                            class="bg-white appearance-none text-[var(--purple)] border-[2px] border-[var(--purple)] rounded-md active:bg-[var(--purple)]/50 transition-all duration-200">
+                           ${tag[0].toUpperCase() + tag.slice(1)}
+                        </option>
+            `;
+        }
+    });
+}
+
 renderNotes();
 
 function showNoteWindow(visible) {
@@ -225,16 +212,22 @@ function updateNoteWindow(type, id = -1) {
 
     switch (type) {
         case "edit":
-            noteWindowInput.disabled = false;
-            noteWindowInput.value = note ? note.name : "";
+            noteNameInput.disabled = false;
+            noteTagInput.disabled = false;
+            noteNameInput.value = note ? note.name : "";
+            noteTagInput.value = note ? note.tags.join(" ") : "";
             break;
         case "new":
-            noteWindowInput.disabled = false;
-            noteWindowInput.value = "";
+            noteNameInput.disabled = false;
+            noteTagInput.disabled = false;
+            noteNameInput.value = "";
+            noteTagInput.value = "";
             break;
         case "view":
-            noteWindowInput.disabled = true;
-            noteWindowInput.value = note ? note.name : "";
+            noteNameInput.disabled = true;
+            noteTagInput.disabled = true;
+            noteNameInput.value = note ? note.name : "";
+            noteTagInput.value = note ? note.tags.join(" ") : "";
             break;
     }
 }
@@ -247,12 +240,15 @@ function deleteNote(id) {
     renderNotes();
 }
 
-function checkNote(id) {
+function checkNote(id, checkbox) {
     const note = notesData.find((note) => note.id === id);
     if (note) {
         note.completed = !note.completed;
+        checkbox.classList.toggle("bg-[var(--purple)]", note.completed);
+        checkbox.querySelector("svg").classList.toggle("opacity-0", !note.completed);
+        checkbox.nextElementSibling.classList.toggle("line-through", note.completed);
+        checkbox.nextElementSibling.classList.toggle("text-[var(--gray)]", note.completed);
     }
-
     saveNotes();
 }
 
@@ -263,18 +259,23 @@ noteForm.addEventListener("submit", (e) => {
     if (noteId === -1) {
         notesData.push({
             id: Date.now(),
-            name: noteWindowInput.value,
+            name: noteNameInput.value,
             completed: false,
+            tags: [...noteTagInput.value.split(" ")],
         });
     } else {
         const note = notesData.find((note) => note.id === noteId);
         if (note) {
-            note.name = noteWindowInput.value;
+            note.name = noteNameInput.value;
+            note.tags = [...noteTagInput.value.split(" ")];
         }
     }
+
     saveNotes();
 
     showNoteWindow(false);
+
+    renderFilterMenu();
 
     renderNotes();
 });
