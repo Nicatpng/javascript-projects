@@ -70,6 +70,8 @@ const cancelButton = document.querySelector("#cancel-button");
 
 const notesContainer = document.querySelector(".notes-container");
 
+const notFound = document.querySelector(".not-found");
+
 const searchInput = document.querySelector("#search-input");
 const filterMenu = document.querySelector(".filter-menu");
 
@@ -89,45 +91,62 @@ function searchNotes(rawNotes) {
     return rawNotes;
 }
 
-function filterNotes(rawNotes) {}
+filterMenu.addEventListener("input", () => {
+    renderNotes();
+});
+
+function filterNotes(rawNotes) {
+    const filterValue = filterMenu.value.toLowerCase();
+
+    if (filterValue !== "" && filterValue !== "all") {
+        const filtered = rawNotes.filter((note) => {
+            switch (filterValue) {
+                case "completed":
+                    return note["completed"];
+                case "incomplete":
+                    return !note["completed"];
+            }
+        });
+        return filtered;
+    }
+    return rawNotes;
+}
 
 function renderNotes() {
     loadNotes();
 
     notesData = searchNotes(notesData);
+    notesData = filterNotes(notesData);
+
+    notFound.classList.toggle("hidden", notesData.length);
 
     notesContainer.innerHTML = "";
 
     notesData.forEach((note, index) => {
         notesContainer.innerHTML += `
                 <div
-                    class="note flex flex-col justify-between items-center after:bg-indigo-500 after:h-[1px] after:w-full after:my-[8px] after:${
-                        index === notesData.length - 1 ? "opacity-0" : ""
-                    }">
+                    class="note flex flex-col justify-between items-center after:bg-indigo-500 after:h-[1px] after:w-full after:my-[8px] after:
+                    ${index === notesData.length - 1 ? "after:opacity-0" : ""}">
                     <div class="flex justify-between items-center w-full rounded-md hover:bg-[var(--light-purple)] py-[16px] px-[16px] transition-all duration-200">
-                        <div class="flex items-center gap-[24px]">
-                            <label class="relative flex items-center justify-center">
-                                <input type="checkbox"
-                                    class="cursor-pointer peer appearance-none w-8 h-8 border-2 border-indigo-500 rounded-sm checked:bg-indigo-500 transition-colors duration-200"
-                                    onclick="checkNote(${note.id})"
-                                    ${note.completed ? "checked" : ""}>
-                                <svg class="absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
-                                    width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <mask id="path-1-inside-1_18_421" fill="white">
-                                    <path d="M4.9978 14.6488L1.72853e-05 9.74756L9.55927 2.22748e-06L14.5571 4.90124L4.9978 14.6488Z"/>
-                                    </mask>
-                                    <path d="M4.9978 14.6488L3.59745 16.0767L5.02539 17.4771L6.42574 16.0491L4.9978 14.6488ZM6.39816 13.2209L1.40037 8.31962L-1.40034 11.1755L3.59745 16.0767L6.39816 13.2209ZM13.1291 3.50089L3.56986 13.2484L6.42574 16.0491L15.985 6.30159L13.1291 3.50089Z" fill="#F7F7F7" mask="url(#path-1-inside-1_18_421)"/>
-                                </svg>
-                            </label>
-                            <p class="note-content text-[24px] ${
-                                note.completed && "line-through opacity-30"
-                            }">${note.name}</p>
-                        </div>
+                        <label class="relative flex items-center justify-start">
+                            <input type="checkbox"
+                                class="cursor-pointer peer appearance-none w-8 h-8 border-2 border-indigo-500 rounded-sm checked:bg-indigo-500 transition-colors duration-200"
+                                ${note.completed ? "checked" : ""}
+                                onclick="checkNote(${note.id})">
+                            <svg class="absolute inest-y-[0] ml-[8px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
+                                width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <mask id="path-1-inside-1_18_421" fill="white">
+                                <path d="M4.9978 14.6488L1.72853e-05 9.74756L9.55927 2.22748e-06L14.5571 4.90124L4.9978 14.6488Z"/>
+                                </mask>
+                                <path d="M4.9978 14.6488L3.59745 16.0767L5.02539 17.4771L6.42574 16.0491L4.9978 14.6488ZM6.39816 13.2209L1.40037 8.31962L-1.40034 11.1755L3.59745 16.0767L6.39816 13.2209ZM13.1291 3.50089L3.56986 13.2484L6.42574 16.0491L15.985 6.30159L13.1291 3.50089Z" fill="#F7F7F7" mask="url(#path-1-inside-1_18_421)"/>
+                            </svg>
+                            <p class="note-content absolute pl-[64px] text-[24px] peer-checked:line-through peer-checked:opacity-30">
+                            ${note.name}</p>
+                        </label>
                         <div class="note-buttons flex items-center">
                             <button
-                                class="note-edit cursor-pointer p-[8px] text-gray-400 hover:text-blue-600 transition-colors duration-200" note-id="${
-                                    note.id
-                                }" onclick="updateNoteWindow('edit', ${note.id})">
+                                class="note-edit cursor-pointer p-[8px] text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                                note-id="${note.id}" onclick="updateNoteWindow('edit', ${note.id})">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -136,9 +155,8 @@ function renderNotes() {
                                 </svg>
                             </button>
                             <button
-                                class="note-remove cursor-pointer p-[8px] text-gray-400 hover:text-red-600 transition-colors duration-200" note-id="${
-                                    note.id
-                                }" onclick="deleteNote(${note.id})">
+                                class="note-remove cursor-pointer p-[8px] text-gray-400 hover:text-red-600 transition-colors duration-200"
+                                note-id="${note.id}" onclick="deleteNote(${note.id})">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -213,8 +231,6 @@ function checkNote(id) {
     }
 
     saveNotes();
-
-    renderNotes();
 }
 
 noteForm.addEventListener("submit", (e) => {

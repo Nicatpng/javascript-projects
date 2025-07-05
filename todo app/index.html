@@ -105,8 +105,12 @@
                 </svg>
             </button>
         </div>
-        <div class="mx-[16px] mt-[32px] flex flex-col justify-between gap-[32px] max-h-[65vh]">
-            <div class="notes-container px-[56px] grid grid-cols-1 overflow-y-auto overscroll-y-auto "></div>
+        <div class="mx-[16px] mt-[32px] flex flex-col justify-between gap-[32px] h-[60vh]">
+            <div class="not-found flex flex-col gap-[20px] justify-between items-center hidden">
+                <img class="w-[220px]" src="assets/not_found.png" alt="not found">
+                <p class="text-[20px]">Empty...</p>
+            </div>
+            <div class="notes-container px-[56px] grid grid-cols-1 overflow-y-auto overscroll-y-auto"></div>
             <div class="flex justify-end items-center">
                 <button
                     class="note-window-button cursor-pointer aspect-square p-[10px] flex justify-center items-center gap-[8px] h-[50px] bg-[var(--purple)] text-white rounded-full active:bg-indigo-700 focus:outline-none active:shadow-md active:shadow-indigo-600/50 transition-all duration-200"
