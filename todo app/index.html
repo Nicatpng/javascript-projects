@@ -35,6 +35,7 @@
             --dark-purple: #534CC2;
             --light-purple: rgb(108, 99, 255, 0.2);
             --white: #F7F7F7;
+            --gray: #9ca3af;
             --black: #252525;
         }
 
@@ -58,7 +59,7 @@
             <div
                 class="search-container w-full py-[8px] px-[16px] border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
                 <input id="search-input" type="text" placeholder="Search note..."
-                    class="w-full h-[40px] focus:outline-none placeholder:purple/50 caret-indigo-700 transition-all duration-200" />
+                    class="w-full h-[40px] focus:outline-none placeholder:text-[var(--gray)] caret-indigo-700 transition-all duration-200" />
                 <button class="cursor-pointer">
                     <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -125,7 +126,7 @@
         </div>
     </div>
     <form
-        class="note-form-container fixed inset-0 flex justify-center items-center opacity-0 invisible transition-all duration-200">
+        class="note-form-container fixed inset-0 flex justify-center items-center z-50 opacity-0 invisible transition-all duration-200">
         <div
             class="note-window absolute bg-[var(--primary-background)] rounded-3xl w-[500px] h-[300px] z-10 p-[32px] flex flex-col justify-between">
             <div class="flex flex-col">
@@ -133,7 +134,7 @@
                 <div
                     class="note-window-input w-full border-[2px] border-[var(--purple)] rounded-md flex items-center focus-within:shadow-md focus-within:shadow-indigo-600/50 transition-all duration-200">
                     <input id="note-window-input" type="text" placeholder="Input your note..." required
-                        class="w-full focus:outline-none py-[8px] px-[16px] placeholder:purple/50 caret-indigo-700 transition-all duration-200" />
+                        class="w-full focus:outline-none py-[8px] px-[16px] placeholder:text-[var(--gray)] caret-indigo-700 disabled:opacity-30 disabled:cursor-no-drop transition-all duration-200" />
                 </div>
             </div>
             <div class="flex justify-between items-center">
@@ -142,7 +143,7 @@
                     id="cancel-button" type="button">CANCEL</button>
                 <button
                     class="bg-[var(--purple)] flex justify-center items-center rounded-md active:bg-indigo-700 focus:outline-none active:shadow-md active:shadow-indigo-600/50 cursor-pointer py-[10px] px-[24px] text-white font-semibold transition-all duration-200"
-                    type="submit">APPLY</button>
+                    type="submit">DONE</button>
             </div>
         </div>
         <div class="new-note-background fixed bg-black opacity-50 inset-0"></div>

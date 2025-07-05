@@ -112,9 +112,19 @@ function filterNotes(rawNotes) {
     return rawNotes;
 }
 
+function addIndexToNotes(notes) {
+    return notes.map((note, index) => {
+        return {
+            ...note,
+            index: index + 1,
+        };
+    });
+}
+
 function renderNotes() {
     loadNotes();
 
+    notesData = addIndexToNotes(notesData);
     notesData = searchNotes(notesData);
     notesData = filterNotes(notesData);
 
@@ -125,27 +135,30 @@ function renderNotes() {
     notesData.forEach((note, index) => {
         notesContainer.innerHTML += `
                 <div
-                    class="note flex flex-col justify-between items-center after:bg-indigo-500 after:h-[1px] after:w-full after:my-[8px] after:
-                    ${index === notesData.length - 1 ? "after:opacity-0" : ""}">
-                    <div class="flex justify-between items-center w-full rounded-md hover:bg-[var(--light-purple)] py-[16px] px-[16px] transition-all duration-200">
-                        <label class="relative flex items-center justify-start">
+                    class="note flex flex-col justify-between items-center after:bg-[var(--purple)] after:h-[1px] after:w-full after:my-[8px] 
+                    after: ${index === notesData.length - 1 ? "after:opacity-0" : ""}">
+                    <div class="flex justify-between items-center w-full gap-[16px]">
+                        <p class="text-[20px] text-[var(--gray)] mr-[10px] min-w-[0px] max-w-[0px] text-end italic">
+                        ${note.index}.</p>
+                        <div class="relative flex items-center justify-start w-full py-[16px] px-[16px]">
                             <input type="checkbox"
-                                class="cursor-pointer peer appearance-none w-8 h-8 border-2 border-indigo-500 rounded-sm checked:bg-indigo-500 transition-colors duration-200"
+                                class="peer appearance-none w-8 h-8 cursor-pointer border-[2px] border-[var(--purple)] rounded-sm checked:bg-[var(--purple)] transition-colors duration-200"
                                 ${note.completed ? "checked" : ""}
                                 onclick="checkNote(${note.id})">
-                            <svg class="absolute inest-y-[0] ml-[8px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
+                            <svg class="absolute inest-y-[0] mx-[9px] pointer-events-none opacity-0 peer-checked:opacity-100 transition-all duration-200"
                                 width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <mask id="path-1-inside-1_18_421" fill="white">
                                 <path d="M4.9978 14.6488L1.72853e-05 9.74756L9.55927 2.22748e-06L14.5571 4.90124L4.9978 14.6488Z"/>
                                 </mask>
                                 <path d="M4.9978 14.6488L3.59745 16.0767L5.02539 17.4771L6.42574 16.0491L4.9978 14.6488ZM6.39816 13.2209L1.40037 8.31962L-1.40034 11.1755L3.59745 16.0767L6.39816 13.2209ZM13.1291 3.50089L3.56986 13.2484L6.42574 16.0491L15.985 6.30159L13.1291 3.50089Z" fill="#F7F7F7" mask="url(#path-1-inside-1_18_421)"/>
                             </svg>
-                            <p class="note-content absolute pl-[64px] text-[24px] peer-checked:line-through peer-checked:opacity-30">
-                            ${note.name}</p>
-                        </label>
+                            <p class="note-content flex justify-start items-center h-full max-w-full absolute left-[64px] right-0 px-[16px] text-[24px] peer-checked:line-through peer-checked:text-[var(--gray)] truncate cursor-pointer rounded-md hover:bg-[var(--light-purple)] transition-all duration-200"
+                            onclick="updateNoteWindow('view', ${note.id})">
+                                ${note.name}</p>
+                        </div>
                         <div class="note-buttons flex items-center">
                             <button
-                                class="note-edit cursor-pointer p-[8px] text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                                class="note-edit cursor-pointer p-[8px] text-[var(--gray)] hover:text-blue-600 transition-colors duration-200"
                                 note-id="${note.id}" onclick="updateNoteWindow('edit', ${note.id})">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -155,7 +168,7 @@ function renderNotes() {
                                 </svg>
                             </button>
                             <button
-                                class="note-remove cursor-pointer p-[8px] text-gray-400 hover:text-red-600 transition-colors duration-200"
+                                class="note-remove cursor-pointer p-[8px] text-[var(--gray)] hover:text-red-600 transition-colors duration-200"
                                 note-id="${note.id}" onclick="deleteNote(${note.id})">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -194,8 +207,8 @@ function loadNotes() {
 renderNotes();
 
 function showNoteWindow(visible) {
-    noteForm.classList.toggle("opacity-0", !visible);
     noteForm.classList.toggle("invisible", !visible);
+    noteForm.classList.toggle("opacity-0", !visible);
 }
 
 cancelButton.addEventListener("click", () => {
@@ -208,11 +221,21 @@ function updateNoteWindow(type, id = -1) {
     noteWindowTitle.innerText = (type + " note").toUpperCase();
     noteForm.setAttribute("note-id", id);
 
-    if (id === -1) {
-        noteWindowInput.value = "";
-    } else {
-        const note = notesData.find((note) => note.id === id);
-        noteWindowInput.value = note ? note.name : "";
+    const note = notesData.find((note) => note.id === id);
+
+    switch (type) {
+        case "edit":
+            noteWindowInput.disabled = false;
+            noteWindowInput.value = note ? note.name : "";
+            break;
+        case "new":
+            noteWindowInput.disabled = false;
+            noteWindowInput.value = "";
+            break;
+        case "view":
+            noteWindowInput.disabled = true;
+            noteWindowInput.value = note ? note.name : "";
+            break;
     }
 }
 
